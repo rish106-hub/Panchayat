@@ -1,0 +1,6 @@
+# Claude local files
+.claude/
+
+# Caveman skill files
+skills/caveman*
+**/skills/caveman*
