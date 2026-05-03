@@ -29,7 +29,7 @@ function exportCSV(complaints) {
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement('a')
   a.href     = url
-  a.download = `panchayat-complaints-${new Date().toISOString().split('T')[0]}.csv`
+  a.download = `spoke-complaints-${new Date().toISOString().split('T')[0]}.csv`
   a.click()
   URL.revokeObjectURL(url)
 }

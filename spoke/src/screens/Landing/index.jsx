@@ -38,7 +38,7 @@ export default function Landing() {
           <span className="material-symbols-outlined text-primary icon-filled" style={{ fontSize: 22 }}>
             spatial_audio
           </span>
-          <span className="font-display font-bold text-tp text-lg">Panchayat</span>
+          <span className="font-display font-bold text-tp text-lg">Spoke</span>
         </div>
 
         {/* Desktop center nav */}

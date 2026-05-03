@@ -1,7 +1,8 @@
-import { createContext, useContext, useReducer, useEffect } from 'react'
+import { createContext, useContext, useReducer, useEffect, useState } from 'react'
 import { DEMO_COMPLAINTS } from '../data/demoComplaints'
+import { LoadingScreen } from '../components/ui/LoadingScreen'
 
-const STORAGE_KEY = 'panchayat_v1'
+const STORAGE_KEY = 'spoke_v2'
 
 function loadFromStorage() {
   try {
@@ -65,6 +66,12 @@ const AppContext = createContext(null)
 
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, null, buildInitialState)
+  const [hydrated, setHydrated] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setHydrated(true), 160)
+    return () => clearTimeout(timer)
+  }, [])
 
   useEffect(() => {
     // Strip transient fields before persisting
@@ -72,7 +79,11 @@ export function AppProvider({ children }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(persistable))
   }, [state])
 
-  return <AppContext.Provider value={{ state, dispatch }}>{children}</AppContext.Provider>
+  return (
+    <AppContext.Provider value={{ state, dispatch }}>
+      {hydrated ? children : <LoadingScreen />}
+    </AppContext.Provider>
+  )
 }
 
 export function useApp() {

@@ -6,7 +6,7 @@ const STEPS = [
     n: '1',
     icon: 'upload_file',
     title: 'Upload your rulebook',
-    body: 'Board uploads the HOA rulebook PDF. Panchayat indexes it so residents can search by voice.',
+    body: 'Board uploads the HOA rulebook PDF. Spoke indexes it so residents can search by voice.',
   },
   {
     n: '2',

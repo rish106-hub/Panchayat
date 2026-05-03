@@ -58,7 +58,7 @@ export default function ResidentHome() {
       className="min-h-screen bg-bg pb-20 md:pb-8"
     >
       <TopBar
-        title="Panchayat"
+        title="Spoke"
         rightContent={
           <div className="flex items-center gap-2">
             <Button size="sm" variant="ghost" onClick={() => navigate('/board')}>Board</Button>

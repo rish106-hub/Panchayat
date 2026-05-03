@@ -18,6 +18,7 @@ export function useVoiceRecording() {
   const [transcript, setTranscript]     = useState('')
   const [interimText, setInterimText]   = useState('')
   const [timerSeconds, setTimerSeconds] = useState(0)
+  const [error, setError]               = useState('')
 
   const recognitionRef   = useRef(null)
   const shouldRestartRef = useRef(false)
@@ -67,12 +68,26 @@ export function useVoiceRecording() {
 
     r.onerror = (e) => {
       if (e.error === 'aborted' || e.error === 'no-speech') return
-      console.warn('SpeechRecognition error:', e.error)
+      setError(e.error === 'not-allowed'
+        ? 'Microphone permission was blocked. Type the complaint instead.'
+        : 'Voice capture is unavailable in this browser. Type the complaint instead.'
+      )
+      shouldRestartRef.current = false
+      setIsRecording(false)
+      stopTimer()
     }
 
     recognitionRef.current = r
     shouldRestartRef.current = true
-    r.start()
+    try {
+      r.start()
+      return true
+    } catch {
+      setError('Voice capture could not start. Type the complaint instead.')
+      setIsRecording(false)
+      stopTimer()
+      return false
+    }
   }
 
   // Fallback simulation
@@ -96,10 +111,11 @@ export function useVoiceRecording() {
     setTranscript('')
     setInterimText('')
     setTimerSeconds(0)
+    setError('')
     startTimer()
 
-    if (SUPPORTED) startReal()
-    else           startSim()
+    const didStart = SUPPORTED ? startReal() : (startSim(), true)
+    if (!didStart) return
 
     setIsRecording(true)
 
@@ -140,6 +156,7 @@ export function useVoiceRecording() {
     transcript,
     interimText,
     timerSeconds,
+    error,
     start,
     stop,
     supported: SUPPORTED,

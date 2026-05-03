@@ -1,7 +1,4 @@
 {
-  "installCommand": "cd spoke && npm ci",
-  "buildCommand": "cd spoke && npm run build",
-  "outputDirectory": "spoke/dist",
   "rewrites": [
     {
       "source": "/(.*)",

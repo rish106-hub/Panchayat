@@ -1,0 +1,21 @@
+{
+  "name": "Spoke",
+  "short_name": "Spoke",
+  "description": "Voice-first HOA management for residents and boards.",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#080D1A",
+  "theme_color": "#080D1A",
+  "icons": [
+    {
+      "src": "/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

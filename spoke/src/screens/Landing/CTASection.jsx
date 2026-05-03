@@ -36,7 +36,7 @@ export function CTASection() {
       </motion.div>
 
       <footer className="mt-16 text-center text-xs text-tm space-x-4">
-        <span>© 2026 Panchayat</span>
+        <span>© 2026 Spoke</span>
         <a href="#" className="hover:text-ts transition-colors">Privacy</a>
         <a href="#" className="hover:text-ts transition-colors">Terms</a>
         <a href="#" className="hover:text-ts transition-colors">Contact</a>

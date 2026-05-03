@@ -52,7 +52,7 @@ export function AIAnswer({ query }) {
         >
           <div className="flex items-center gap-2 mb-3">
             <span className="material-symbols-outlined text-primary" style={{ fontSize: 16 }}>auto_awesome</span>
-            <span className="text-xs font-medium text-primary">Panchayat AI</span>
+            <span className="text-xs font-medium text-primary">Spoke AI</span>
           </div>
           <div className="space-y-2">
             <div className="h-3 bg-primary/10 rounded animate-pulse w-4/5" />
@@ -73,7 +73,7 @@ export function AIAnswer({ query }) {
         >
           <div className="flex items-center gap-2 mb-2">
             <span className="material-symbols-outlined text-primary" style={{ fontSize: 16 }}>auto_awesome</span>
-            <span className="text-xs font-medium text-primary">Panchayat AI</span>
+            <span className="text-xs font-medium text-primary">Spoke AI</span>
             <span className="ml-auto text-xs text-tm">{result.section}</span>
           </div>
           <p className="text-sm text-tp leading-relaxed">{result.answer}</p>
@@ -93,7 +93,7 @@ export function AIAnswer({ query }) {
         >
           <div className="flex items-center gap-2 mb-2">
             <span className="material-symbols-outlined text-primary" style={{ fontSize: 16 }}>auto_awesome</span>
-            <span className="text-xs font-medium text-primary">Panchayat AI</span>
+            <span className="text-xs font-medium text-primary">Spoke AI</span>
           </div>
           <p className="text-sm text-ts">No matching rule found for "{query}". Try different keywords.</p>
         </motion.div>

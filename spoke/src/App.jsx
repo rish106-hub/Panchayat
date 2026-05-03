@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { Toast } from './components/ui/Toast'
+import { DemoGuide } from './components/ui/DemoGuide'
 import Landing        from './screens/Landing/index'
 import ResidentHome   from './screens/ResidentHome/index'
 import VoiceRecording from './screens/VoiceRecording/index'
@@ -31,6 +32,7 @@ export default function App() {
         </Routes>
       </AnimatePresence>
       <Toast />
+      <DemoGuide />
     </>
   )
 }
