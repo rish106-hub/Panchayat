@@ -1,6 +1,58 @@
 # Claude local files
 .claude/
 
-# Caveman skill files
+# Local agent skill files
+/.adal/
+/.agents/
+/.aider-desk/
+/.augment/
+/.bob/
+/.codeartsdoer/
+/.codebuddy/
+/.codemaker/
+/.codestudio/
+/.commandcode/
+/.continue/
+/.cortex/
+/.crush/
+/.devin/
+/.factory/
+/.forge/
+/.goose/
+/.iflow/
+/.junie/
+/.kilocode/
+/.kiro/
+/.kode/
+/.mcpjam/
+/.mux/
+/.neovate/
+/.openhands/
+/.pi/
+/.pochi/
+/.qoder/
+/.qwen/
+/.roo/
+/.rovodev/
+/.tabnine/
+/.trae/
+/.vibe/
+/.windsurf/
+/.zencoder/
+/skills/
+/skills-lock.json
 skills/caveman*
 **/skills/caveman*
+skills/cavecrew*
+**/skills/cavecrew*
+skills/compress*
+**/skills/compress*
+
+# Dependencies and build output
+node_modules/
+dist/
+spoke/node_modules/
+spoke/dist/
+
+# Vercel local project metadata
+.vercel
