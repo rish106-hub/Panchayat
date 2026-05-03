@@ -8,6 +8,7 @@ import { TopBar } from '../../components/layout/TopBar'
 import { BottomNav } from '../../components/layout/BottomNav'
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+const CURRENT_DUES_PERIOD = 'May 2026'
 
 function buildDuesState() {
   return Object.fromEntries(RESIDENTS.map(r => [r.id, r.dues]))
@@ -56,15 +57,15 @@ export default function Maintenance() {
         <div className="px-4 md:px-8 py-5 md:py-8 max-w-4xl">
           <div className="hidden md:block mb-6">
             <h1 className="font-display font-bold text-2xl text-tp">Maintenance Dues</h1>
-            <p className="text-sm text-ts mt-1">May 2025 · ${DUES_AMOUNT}/unit</p>
+            <p className="text-sm text-ts mt-1">{CURRENT_DUES_PERIOD} · ${DUES_AMOUNT}/unit</p>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-3 mb-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
             {[
               { label: 'Collected',   value: `$${totalCollected.toLocaleString()}`,  color: '#10B981', icon: 'check_circle'          },
               { label: 'Overdue',     value: `$${totalOverdue.toLocaleString()}`,     color: '#EF4444', icon: 'warning'               },
-              { label: 'Not Joined',  value: `$${totalPending.toLocaleString()}`,     color: '#F59E0B', icon: 'hourglass_empty'        },
+              { label: 'Pending',     value: `$${totalPending.toLocaleString()}`,     color: '#F59E0B', icon: 'hourglass_empty'        },
             ].map(s => (
               <div key={s.label} className="bg-surface border border-bdr rounded-2xl p-4">
                 <div className="flex items-center justify-between">
@@ -124,7 +125,7 @@ export default function Maintenance() {
               const status = duesState[r.id]
               const s = STATUS[status]
               return (
-                <motion.div key={r.id} variants={listItem} className="flex items-center gap-3 px-4 py-3">
+                <motion.div key={r.id} variants={listItem} className="flex flex-wrap sm:flex-nowrap items-center gap-3 px-4 py-3">
                   <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-primary text-xs font-bold flex-shrink-0">
                     {r.avatar}
                   </div>
@@ -136,7 +137,7 @@ export default function Maintenance() {
                   <span className={`text-xs px-2 py-0.5 rounded-md border font-medium ${s.bg} ${s.text} ${s.border}`}>
                     {s.label}
                   </span>
-                  <div className="flex gap-1.5">
+                  <div className="flex gap-1.5 ml-auto">
                     {status !== 'paid' && (
                       <button
                         onClick={() => markPaid(r)}

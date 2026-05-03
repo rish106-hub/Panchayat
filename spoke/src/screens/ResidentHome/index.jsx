@@ -32,6 +32,12 @@ export default function ResidentHome() {
   const [showPayModal, setShowPayModal] = useState(false)
   const [paying, setPaying] = useState(false)
   const [paid, setPaid] = useState(false)
+  const duesPeriod = 'May 2026'
+  const dueDate = 'May 5, 2026'
+
+  function openVoiceFlow() {
+    navigate('/voice')
+  }
 
   function handlePay() {
     setPaying(true)
@@ -52,7 +58,7 @@ export default function ResidentHome() {
       className="min-h-screen bg-bg pb-20 md:pb-8"
     >
       <TopBar
-        title="Spoke"
+        title="Panchayat"
         rightContent={
           <div className="flex items-center gap-2">
             <Button size="sm" variant="ghost" onClick={() => navigate('/board')}>Board</Button>
@@ -76,10 +82,16 @@ export default function ResidentHome() {
           variants={listItem}
           initial="initial"
           animate="animate"
-          onClick={() => navigate('/voice')}
+          onClick={openVoiceFlow}
           className="bg-surface border border-bdr rounded-2xl p-6 flex flex-col items-center gap-4 cursor-pointer hover:border-voice/40 transition-colors duration-150 active:scale-[0.99]"
         >
-          <MicButton size="md" onClick={() => navigate('/voice')} />
+          <MicButton
+            size="md"
+            onClick={(event) => {
+              event.stopPropagation()
+              openVoiceFlow()
+            }}
+          />
           <div className="text-center">
             <p className="font-display font-semibold text-tp">Report an issue</p>
             <p className="text-xs text-ts mt-1">Tap and speak — AI handles the rest</p>
@@ -110,7 +122,7 @@ export default function ResidentHome() {
             <div className="bg-surface border border-bdr rounded-2xl p-6 text-center">
               <span className="material-symbols-outlined text-tm" style={{ fontSize: 32 }}>inbox</span>
               <p className="text-sm text-ts mt-2">No complaints filed yet</p>
-              <Button size="sm" className="mt-3" onClick={() => navigate('/voice')}>
+              <Button size="sm" className="mt-3" onClick={openVoiceFlow}>
                 File first complaint
               </Button>
             </div>
@@ -125,7 +137,7 @@ export default function ResidentHome() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-tp">May Maintenance</p>
-              <p className="text-xs text-ts">{paid ? 'Paid ✓' : '$320 · Due May 5'}</p>
+              <p className="text-xs text-ts">{paid ? 'Paid' : `$320 · Due ${dueDate}`}</p>
             </div>
             {!paid ? (
               <Button size="sm" onClick={() => setShowPayModal(true)}>Pay now</Button>
@@ -173,10 +185,10 @@ export default function ResidentHome() {
                 </div>
                 <div className="bg-surface-raised rounded-xl p-4 mb-4 divide-y divide-bdr">
                   {[
-                    { label: 'Description', value: 'May 2025 HOA Maintenance' },
+                    { label: 'Description', value: `${duesPeriod} HOA Maintenance` },
                     { label: 'Unit',        value: state.user.unit },
                     { label: 'Amount',      value: '$320.00' },
-                    { label: 'Due date',    value: 'May 5, 2025' },
+                    { label: 'Due date',    value: dueDate },
                   ].map(({ label, value }) => (
                     <div key={label} className="flex justify-between py-2 first:pt-0 last:pb-0">
                       <span className="text-xs text-tm">{label}</span>

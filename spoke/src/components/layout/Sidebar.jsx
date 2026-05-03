@@ -23,7 +23,7 @@ export function Sidebar() {
           spatial_audio
         </span>
         <div>
-          <span className="font-display font-bold text-tp text-base">Spoke</span>
+          <span className="font-display font-bold text-tp text-base">Panchayat</span>
           <p className="text-xs text-tm leading-tight">Parkview HOA · Board</p>
         </div>
       </div>

@@ -28,7 +28,7 @@ export default function VoiceRecording() {
   function handleSubmit() {
     if (!transcript.trim()) return
     addComplaint(transcript.trim())
-    navigate('/confirmation')
+    navigate('/confirmation', { replace: true })
   }
 
   const hasTranscript = transcript.trim().length > 0
@@ -139,7 +139,7 @@ export default function VoiceRecording() {
             )}
           </Button>
 
-          <Button fullWidth variant="ghost" onClick={() => navigate('/home')}>
+          <Button fullWidth variant="ghost" onClick={() => navigate('/home', { replace: true })}>
             Cancel
           </Button>
 

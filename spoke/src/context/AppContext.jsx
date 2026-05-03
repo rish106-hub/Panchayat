@@ -1,7 +1,7 @@
 import { createContext, useContext, useReducer, useEffect } from 'react'
 import { DEMO_COMPLAINTS } from '../data/demoComplaints'
 
-const STORAGE_KEY = 'spoke_v2'
+const STORAGE_KEY = 'panchayat_v1'
 
 function loadFromStorage() {
   try {

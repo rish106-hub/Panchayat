@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { pageVariants, checkSpring, listContainer, listItem } from '../../utils/motion'
 import { useApp } from '../../context/AppContext'
@@ -14,8 +14,7 @@ export default function Confirmation() {
   const complaint = state.currentComplaint
 
   if (!complaint) {
-    navigate('/home')
-    return null
+    return <Navigate to="/home" replace />
   }
 
   const rows = [

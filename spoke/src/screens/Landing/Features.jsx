@@ -6,13 +6,13 @@ const FEATURES = [
     icon: 'record_voice_over',
     color: '#FF6B6B',
     title: 'Voice-first complaints',
-    body: 'Speak your issue and Spoke transcribes, classifies, and routes it automatically. No typing, no forms.',
+    body: 'Speak your issue and Panchayat transcribes, classifies, and routes it automatically. No typing, no forms.',
   },
   {
     icon: 'auto_awesome',
     color: '#6366F1',
     title: 'Smart rulebook search',
-    body: 'Ask questions in plain English. Spoke finds the relevant HOA rule and surfaces the answer instantly.',
+    body: 'Ask questions in plain English. Panchayat finds the relevant HOA rule and surfaces the answer instantly.',
   },
   {
     icon: 'dashboard',

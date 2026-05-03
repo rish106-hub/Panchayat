@@ -15,6 +15,7 @@ import { GATE_LOG } from '../../data/gateLogData'
 import { formatTimestamp } from '../../utils/timeAgo'
 
 const OVERDUE_RESIDENTS = RESIDENTS.filter(r => r.dues === 'overdue')
+const CURRENT_DUES_PERIOD = 'May 2026'
 
 function exportCSV(complaints) {
   const header = ['ID', 'Category', 'Priority', 'Status', 'Unit', 'Resident', 'Filed', 'Transcript']
@@ -28,7 +29,7 @@ function exportCSV(complaints) {
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement('a')
   a.href     = url
-  a.download = `spoke-complaints-${new Date().toISOString().split('T')[0]}.csv`
+  a.download = `panchayat-complaints-${new Date().toISOString().split('T')[0]}.csv`
   a.click()
   URL.revokeObjectURL(url)
 }
@@ -124,7 +125,7 @@ export default function BoardDashboard() {
                     <div key={r.id} className="flex items-center justify-between px-4 py-3">
                       <div>
                         <p className="text-sm text-tp font-medium">Unit {r.unit} · {r.name}</p>
-                        <p className="text-xs text-tm">May 2025</p>
+                        <p className="text-xs text-tm">{CURRENT_DUES_PERIOD}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-sm text-err font-semibold">$320</span>
