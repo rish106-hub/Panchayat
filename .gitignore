@@ -62,3 +62,14 @@ spoke/.env
 spoke/.env.local
 spoke/.env.production.local
 spoke/.env.development.local
+
+# MCP config — contains API tokens
+.mcp.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/settings.json
