@@ -1,37 +1,30 @@
 import { useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useApp } from '../../context/AppContext'
-import { toastVariants } from '../../utils/motion'
+import { useApp }  from '../../context/AppContext'
 
 export function Toast() {
   const { state, dispatch } = useApp()
-  const { message, visible } = state.toast
+  const { toast } = state
 
   useEffect(() => {
-    if (!visible) return
-    const id = setTimeout(() => dispatch({ type: 'HIDE_TOAST' }), 3500)
-    return () => clearTimeout(id)
-  }, [visible, message, dispatch])
+    if (!toast.visible) return
+    const t = setTimeout(() => dispatch({ type: 'HIDE_TOAST' }), 3500)
+    return () => clearTimeout(t)
+  }, [toast.visible, dispatch])
+
+  if (!toast.visible) return null
 
   return (
-    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 md:bottom-6 md:left-auto md:right-6 md:translate-x-0 pointer-events-none">
-      <AnimatePresence>
-        {visible && (
-          <motion.div
-            key={message}
-            variants={toastVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="flex items-center gap-2.5 bg-surface-raised border border-bdr rounded-xl px-4 py-3 shadow-2xl text-sm text-tp pointer-events-auto whitespace-nowrap"
-          >
-            <span className="material-symbols-outlined text-ok icon-filled" style={{ fontSize: 16 }}>
-              check_circle
-            </span>
-            {message}
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] animate-slide-up">
+      <div className="flex items-center gap-2.5 px-4 py-3 bg-text-primary text-white rounded-xl shadow-modal text-sm font-medium max-w-sm">
+        <span className="material-symbols-rounded text-success shrink-0" style={{ fontSize: 18 }}>check_circle</span>
+        {toast.message}
+        <button
+          onClick={() => dispatch({ type: 'HIDE_TOAST' })}
+          className="ml-1 text-white/60 hover:text-white transition-colors shrink-0"
+        >
+          <span className="material-symbols-rounded" style={{ fontSize: 16 }}>close</span>
+        </button>
+      </div>
     </div>
   )
 }

@@ -1,66 +1,75 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
-import { AnimatePresence } from 'framer-motion'
-import { Toast }           from './components/ui/Toast'
-import { DemoGuide }       from './components/ui/DemoGuide'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { useAuth }         from './context/AuthContext'
+import { AppShell }        from './components/layout/AppShell'
 import { ProtectedRoute }  from './components/ui/ProtectedRoute'
 import { LoadingScreen }   from './components/ui/LoadingScreen'
+import { Toast }           from './components/ui/Toast'
 
-// Eagerly load public + auth screens
-import Landing     from './screens/Landing/index'
-import AuthScreen  from './screens/Auth/index'
-import Onboarding  from './screens/Auth/Onboarding'
+// Public screens — eagerly loaded
+import Landing    from './screens/Landing/index'
+import AuthScreen from './screens/Auth/index'
+import Onboarding from './screens/Auth/Onboarding'
 
-// Lazy-load all app screens (code splitting)
-const ResidentHome   = lazy(() => import('./screens/ResidentHome/index'))
-const VoiceRecording = lazy(() => import('./screens/VoiceRecording/index'))
-const Confirmation   = lazy(() => import('./screens/Confirmation/index'))
-const BoardDashboard = lazy(() => import('./screens/BoardDashboard/index'))
-const Rulebook       = lazy(() => import('./screens/Rulebook/index'))
-const Residents      = lazy(() => import('./screens/Residents/index'))
-const Maintenance    = lazy(() => import('./screens/Maintenance/index'))
-const GateLog        = lazy(() => import('./screens/GateLog/index'))
+// Resident screens
+const ResidentHome    = lazy(() => import('./screens/dashboard/resident/Home'))
+const VoiceComplaint  = lazy(() => import('./screens/dashboard/resident/VoiceComplaint'))
+const Confirmation    = lazy(() => import('./screens/dashboard/resident/Confirmation'))
+const MyComplaints    = lazy(() => import('./screens/dashboard/resident/MyComplaints'))
+const Dues            = lazy(() => import('./screens/dashboard/resident/Dues'))
+const Rulebook        = lazy(() => import('./screens/dashboard/resident/Rulebook'))
 
-function Protected({ children, role }) {
+// Board screens
+const BoardOverview   = lazy(() => import('./screens/dashboard/board/Overview'))
+const BoardComplaints = lazy(() => import('./screens/dashboard/board/Complaints'))
+const BoardResidents  = lazy(() => import('./screens/dashboard/board/Residents'))
+const Maintenance     = lazy(() => import('./screens/dashboard/board/Maintenance'))
+const GateLog         = lazy(() => import('./screens/dashboard/board/GateLog'))
+
+function DashboardIndex() {
+  const { isBoard } = useAuth()
+  return isBoard ? <BoardOverview /> : <ResidentHome />
+}
+
+function DashboardComplaints() {
+  const { isBoard } = useAuth()
+  return isBoard ? <BoardComplaints /> : <MyComplaints />
+}
+
+function DashboardLayout() {
   return (
-    <ProtectedRoute requiredRole={role}>
-      <Suspense fallback={<LoadingScreen />}>
-        {children}
-      </Suspense>
+    <ProtectedRoute>
+      <AppShell>
+        <Suspense fallback={<LoadingScreen />}>
+          <Routes>
+            <Route index                  element={<DashboardIndex />} />
+            <Route path="voice"           element={<VoiceComplaint />} />
+            <Route path="confirmation"    element={<Confirmation />} />
+            <Route path="complaints"      element={<DashboardComplaints />} />
+            <Route path="dues"            element={<Dues />} />
+            <Route path="rulebook"        element={<Rulebook />} />
+            <Route path="residents"       element={<BoardResidents />} />
+            <Route path="maintenance"     element={<Maintenance />} />
+            <Route path="gate"            element={<GateLog />} />
+            <Route path="*"               element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </Suspense>
+      </AppShell>
     </ProtectedRoute>
   )
 }
 
 export default function App() {
-  const location = useLocation()
-
   return (
     <>
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          {/* Public */}
-          <Route path="/"           element={<Landing />} />
-          <Route path="/login"      element={<AuthScreen />} />
-          <Route path="/onboarding" element={<Onboarding />} />
-
-          {/* Protected — any authenticated role */}
-          <Route path="/home"         element={<Protected><ResidentHome /></Protected>} />
-          <Route path="/voice"        element={<Protected><VoiceRecording /></Protected>} />
-          <Route path="/confirmation" element={<Protected><Confirmation /></Protected>} />
-          <Route path="/rulebook"     element={<Protected><Rulebook /></Protected>} />
-
-          {/* Protected — board only */}
-          <Route path="/board"       element={<Protected role="board"><BoardDashboard /></Protected>} />
-          <Route path="/residents"   element={<Protected role="board"><Residents /></Protected>} />
-          <Route path="/maintenance" element={<Protected role="board"><Maintenance /></Protected>} />
-          <Route path="/gate-log"    element={<Protected role="board"><GateLog /></Protected>} />
-
-          {/* Catch-all */}
-          <Route path="*" element={<Landing />} />
-        </Routes>
-      </AnimatePresence>
+      <Routes>
+        <Route path="/"            element={<Landing />} />
+        <Route path="/login"       element={<AuthScreen />} />
+        <Route path="/onboarding"  element={<Onboarding />} />
+        <Route path="/dashboard/*" element={<DashboardLayout />} />
+        <Route path="*"            element={<Navigate to="/" replace />} />
+      </Routes>
       <Toast />
-      <DemoGuide />
     </>
   )
 }

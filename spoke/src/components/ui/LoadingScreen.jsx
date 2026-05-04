@@ -1,22 +1,20 @@
 export function LoadingScreen() {
   return (
-    <main className="min-h-screen bg-bg flex items-center justify-center px-4">
-      <section className="w-full max-w-sm space-y-5">
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary icon-filled" style={{ fontSize: 22 }}>spatial_audio</span>
-          </div>
-          <div>
-            <p className="font-display font-bold text-tp">Spoke</p>
-            <p className="text-xs text-tm">Preparing demo workspace</p>
-          </div>
+    <div className="min-h-screen bg-canvas flex items-center justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center">
+          <span className="material-symbols-rounded text-white" style={{ fontSize: 20 }}>spatial_audio</span>
         </div>
-        <div className="bg-surface border border-bdr rounded-2xl p-4 space-y-3">
-          <div className="h-3 w-2/3 rounded bg-surface-raised animate-pulse" />
-          <div className="h-3 w-full rounded bg-surface-raised animate-pulse" />
-          <div className="h-3 w-5/6 rounded bg-surface-raised animate-pulse" />
+        <div className="flex gap-1">
+          {[0, 1, 2].map(i => (
+            <div
+              key={i}
+              className="w-1.5 h-1.5 rounded-full bg-brand-600 animate-bounce"
+              style={{ animationDelay: `${i * 0.15}s` }}
+            />
+          ))}
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
   )
 }

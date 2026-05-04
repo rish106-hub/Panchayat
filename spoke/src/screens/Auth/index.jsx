@@ -1,176 +1,160 @@
 import { useState } from 'react'
 import { useNavigate, Navigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { pageVariants, fadeUp } from '../../utils/motion'
-import { useAuth } from '../../context/AuthContext'
-import { Button } from '../../components/ui/Button'
+import { useAuth }  from '../../context/AuthContext'
+import { Button }   from '../../components/ui/Button'
+import { Input }    from '../../components/ui/Input'
 
-// ── Phone step ─────────────────────────────────────────────────────────────
+function Logo() {
+  const navigate = useNavigate()
+  return (
+    <button onClick={() => navigate('/')} className="flex items-center gap-2 mb-8">
+      <div className="w-8 h-8 rounded-xl bg-brand-600 flex items-center justify-center">
+        <span className="material-symbols-rounded text-white" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>spatial_audio</span>
+      </div>
+      <span className="text-base font-semibold text-text-primary">Spoke</span>
+    </button>
+  )
+}
 
 function PhoneStep({ onSent }) {
   const { sendOtp } = useAuth()
   const [phone,   setPhone]   = useState('')
   const [loading, setLoading] = useState(false)
-  const [err,     setErr]     = useState('')
+  const [error,   setError]   = useState('')
 
   function normalise(raw) {
-    // Strip spaces/dashes, ensure + prefix
-    const digits = raw.replace(/[^\d+]/g, '')
-    return digits.startsWith('+') ? digits : `+${digits}`
+    const d = raw.replace(/[^\d+]/g, '')
+    return d.startsWith('+') ? d : `+1${d}`
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
-    const normalised = normalise(phone)
-    if (normalised.length < 10) { setErr('Enter a valid phone number with country code.'); return }
-    setErr('')
+    const p = normalise(phone)
+    if (p.length < 10) { setError('Enter a valid phone number.'); return }
+    setError('')
     setLoading(true)
-    const { error } = await sendOtp(normalised)
+    const { error: err } = await sendOtp(p)
     setLoading(false)
-    if (error) { setErr(error); return }
-    onSent(normalised)
+    if (err) { setError(typeof err === 'string' ? err : err.message); return }
+    onSent(p)
   }
 
   return (
-    <motion.div key="phone" variants={fadeUp} initial="initial" animate="animate" exit="exit">
-      <h2 className="font-display font-bold text-2xl text-tp mb-2">Welcome back</h2>
-      <p className="text-sm text-ts mb-8">Enter your phone number to receive a one-time code.</p>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="text-xs font-medium text-tm uppercase tracking-wider block mb-1.5">
-            Phone number
-          </label>
-          <input
-            type="tel"
-            value={phone}
-            onChange={e => setPhone(e.target.value)}
-            placeholder="+1 555 000 0000"
-            autoFocus
-            className="w-full bg-bg border border-bdr rounded-xl px-4 py-3 text-sm text-tp placeholder:text-tm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-          />
-          {err && <p className="text-xs text-err mt-2">{err}</p>}
-        </div>
-
-        <Button type="submit" fullWidth size="lg" disabled={loading}>
-          {loading ? 'Sending code…' : 'Send code'}
-          {!loading && (
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_forward</span>
-          )}
-        </Button>
-      </form>
-    </motion.div>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <h1 className="text-xl font-bold text-text-primary mb-1">Sign in to Spoke</h1>
+        <p className="text-sm text-text-secondary">Enter your phone number to receive a verification code.</p>
+      </div>
+      <Input
+        label="Phone number"
+        type="tel"
+        value={phone}
+        onChange={e => setPhone(e.target.value)}
+        placeholder="+1 (555) 000-0000"
+        autoFocus
+        error={error}
+      />
+      <Button type="submit" fullWidth loading={loading}>
+        Send verification code
+        {!loading && <span className="material-symbols-rounded" style={{ fontSize: 16 }}>arrow_forward</span>}
+      </Button>
+    </form>
   )
 }
-
-// ── OTP step ───────────────────────────────────────────────────────────────
 
 function OtpStep({ phone, onBack }) {
   const navigate = useNavigate()
   const { verifyOtp } = useAuth()
   const [otp,     setOtp]     = useState('')
   const [loading, setLoading] = useState(false)
-  const [err,     setErr]     = useState('')
+  const [error,   setError]   = useState('')
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (otp.length < 4) { setErr('Enter the 6-digit code.'); return }
-    setErr('')
+    if (otp.length < 6) { setError('Enter the 6-digit code.'); return }
+    setError('')
     setLoading(true)
-    const { error } = await verifyOtp(phone, otp.trim())
+    const { error: err } = await verifyOtp(phone, otp.trim())
     setLoading(false)
-    if (error) { setErr(error); return }
-    navigate('/home', { replace: true })
+    if (err) { setError(typeof err === 'string' ? err : err.message); return }
+    navigate('/dashboard', { replace: true })
   }
 
   return (
-    <motion.div key="otp" variants={fadeUp} initial="initial" animate="animate" exit="exit">
-      <button onClick={onBack} className="flex items-center gap-1 text-sm text-ts hover:text-tp mb-6 transition-colors">
-        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>arrow_back</span>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm text-text-muted hover:text-text-primary mb-1 transition-colors">
+        <span className="material-symbols-rounded" style={{ fontSize: 16 }}>arrow_back</span>
         Back
       </button>
-
-      <h2 className="font-display font-bold text-2xl text-tp mb-2">Check your phone</h2>
-      <p className="text-sm text-ts mb-8">
-        We sent a 6-digit code to <span className="text-tp font-medium">{phone}</span>
-      </p>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="text-xs font-medium text-tm uppercase tracking-wider block mb-1.5">
-            Verification code
-          </label>
-          <input
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={6}
-            value={otp}
-            onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
-            placeholder="000000"
-            autoFocus
-            className="w-full bg-bg border border-bdr rounded-xl px-4 py-3 text-center text-2xl font-mono text-tp tracking-[0.5em] placeholder:text-tm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-          />
-          {err && <p className="text-xs text-err mt-2">{err}</p>}
-        </div>
-
-        <Button type="submit" fullWidth size="lg" disabled={loading}>
-          {loading ? 'Verifying…' : 'Verify & sign in'}
-        </Button>
-      </form>
-    </motion.div>
+      <div>
+        <h1 className="text-xl font-bold text-text-primary mb-1">Check your phone</h1>
+        <p className="text-sm text-text-secondary">
+          6-digit code sent to <span className="font-medium text-text-primary">{phone}</span>
+        </p>
+      </div>
+      <div className="space-y-1.5">
+        <label className="text-sm font-medium text-text-primary">Verification code</label>
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          maxLength={6}
+          value={otp}
+          onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
+          placeholder="000000"
+          autoFocus
+          className="w-full h-12 rounded-lg border border-border bg-surface text-center text-xl font-mono font-medium text-text-primary tracking-[0.4em] placeholder:text-text-muted placeholder:tracking-normal focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-600 transition-colors"
+        />
+        {error && <p className="text-xs text-danger">{error}</p>}
+      </div>
+      <Button type="submit" fullWidth loading={loading}>
+        Verify and sign in
+      </Button>
+    </form>
   )
 }
 
-// ── Main Auth screen ───────────────────────────────────────────────────────
-
 export default function AuthScreen() {
   const { isAuthenticated, IS_DEMO } = useAuth()
-  const [step,  setStep]  = useState('phone')  // 'phone' | 'otp'
+  const [step,  setStep]  = useState('phone')
   const [phone, setPhone] = useState('')
 
-  if (IS_DEMO || isAuthenticated) return <Navigate to="/home" replace />
+  if (IS_DEMO || isAuthenticated) return <Navigate to="/dashboard" replace />
 
   return (
-    <motion.div
-      variants={pageVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      className="min-h-screen bg-bg flex flex-col"
-    >
-      {/* Header */}
-      <header className="flex items-center gap-2 px-6 h-16">
-        <span className="material-symbols-outlined text-primary icon-filled" style={{ fontSize: 22 }}>
-          spatial_audio
-        </span>
-        <span className="font-display font-bold text-tp text-lg">Spoke</span>
-      </header>
+    <div className="min-h-screen bg-canvas flex">
+      {/* Left panel (desktop) */}
+      <div className="hidden lg:flex flex-col bg-brand-600 w-96 shrink-0 p-10 text-white">
+        <div className="flex items-center gap-2.5 mb-auto">
+          <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
+            <span className="material-symbols-rounded text-white" style={{ fontSize: 18 }}>spatial_audio</span>
+          </div>
+          <span className="font-semibold">Spoke</span>
+        </div>
+        <div>
+          <p className="text-2xl font-bold leading-snug mb-3">
+            "Spoke saved us hours every week. Residents love the voice feature."
+          </p>
+          <p className="text-brand-200 text-sm">— Board President, Maple Heights HOA</p>
+        </div>
+      </div>
 
-      {/* Card */}
-      <div className="flex-1 flex items-center justify-center px-4 py-8">
+      {/* Right panel */}
+      <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
-          <AnimatePresence mode="wait">
-            {step === 'phone' ? (
-              <PhoneStep
-                key="phone"
-                onSent={(p) => { setPhone(p); setStep('otp') }}
-              />
-            ) : (
-              <OtpStep
-                key="otp"
-                phone={phone}
-                onBack={() => setStep('phone')}
-              />
-            )}
-          </AnimatePresence>
-
-          <p className="text-center text-xs text-tm mt-8 leading-relaxed">
-            By signing in you agree to our terms of service.<br />
-            Your data stays within your society only.
+          <Logo />
+          {step === 'phone' ? (
+            <PhoneStep onSent={p => { setPhone(p); setStep('otp') }} />
+          ) : (
+            <OtpStep phone={phone} onBack={() => setStep('phone')} />
+          )}
+          <p className="mt-6 text-center text-xs text-text-muted">
+            By signing in, you agree to our{' '}
+            <a href="#" className="text-brand-600 hover:underline">Terms</a>{' '}and{' '}
+            <a href="#" className="text-brand-600 hover:underline">Privacy Policy</a>.
           </p>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
