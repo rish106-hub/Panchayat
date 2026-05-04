@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { pageVariants } from '../../utils/motion'
+import { useAuth } from '../../context/AuthContext'
 import { Button } from '../../components/ui/Button'
 import { Hero } from './Hero'
 import { Features } from './Features'
@@ -10,6 +11,7 @@ import { CTASection } from './CTASection'
 
 export default function Landing() {
   const navigate = useNavigate()
+  const { IS_DEMO, switchDemoRole } = useAuth()
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -17,6 +19,11 @@ export default function Landing() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  function enterAs(role) {
+    if (IS_DEMO) switchDemoRole(role)
+    navigate(role === 'board' ? '/board' : '/home')
+  }
 
   return (
     <motion.div
@@ -43,16 +50,16 @@ export default function Landing() {
 
         {/* Desktop center nav */}
         <nav className="hidden md:flex items-center gap-6 text-sm text-ts">
-          <a href="#features" className="hover:text-tp transition-colors">Features</a>
-          <a href="#howitworks" className="hover:text-tp transition-colors">How it works</a>
+          <a href="#features"    className="hover:text-tp transition-colors">Features</a>
+          <a href="#howitworks"  className="hover:text-tp transition-colors">How it works</a>
         </nav>
 
         {/* Right CTAs */}
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/board')}>
+          <Button variant="ghost" size="sm" onClick={() => enterAs('board')}>
             Board login
           </Button>
-          <Button size="sm" onClick={() => navigate('/home')}>
+          <Button size="sm" onClick={() => enterAs('resident')}>
             Try as Resident
           </Button>
         </div>

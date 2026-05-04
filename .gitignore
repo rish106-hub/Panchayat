@@ -56,3 +56,9 @@ spoke/dist/
 
 # Vercel local project metadata
 .vercel
+
+# Environment secrets — NEVER commit
+spoke/.env
+spoke/.env.local
+spoke/.env.production.local
+spoke/.env.development.local
