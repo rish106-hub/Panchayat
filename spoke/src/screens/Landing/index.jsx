@@ -66,9 +66,13 @@ export default function Landing() {
   const navigate = useNavigate()
   const { IS_DEMO, switchDemoRole } = useAuth()
 
-  function enter(role) {
-    if (IS_DEMO) switchDemoRole(role)
+  function tryDemo(role) {
+    switchDemoRole(role)
     navigate('/dashboard')
+  }
+
+  function goToLogin() {
+    navigate('/login')
   }
 
   return (
@@ -84,14 +88,23 @@ export default function Landing() {
           </button>
 
           <nav className="hidden md:flex items-center gap-6 text-sm text-text-secondary">
-            <a href="#features"  className="hover:text-text-primary transition-colors">Features</a>
-            <a href="#how"       className="hover:text-text-primary transition-colors">How it works</a>
+            <a href="#features"     className="hover:text-text-primary transition-colors">Features</a>
+            <a href="#how"          className="hover:text-text-primary transition-colors">How it works</a>
             <a href="#testimonials" className="hover:text-text-primary transition-colors">Reviews</a>
           </nav>
 
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => enter('board')}>Board login</Button>
-            <Button size="sm" onClick={() => enter('resident')}>Try free demo</Button>
+            {IS_DEMO ? (
+              <>
+                <Button variant="ghost" size="sm" onClick={() => tryDemo('board')}>Board demo</Button>
+                <Button size="sm" onClick={() => tryDemo('resident')}>Resident demo</Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" onClick={goToLogin}>Sign in</Button>
+                <Button size="sm" onClick={goToLogin}>Get started</Button>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -114,14 +127,29 @@ export default function Landing() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center mb-16">
-          <Button size="lg" onClick={() => enter('resident')}>
-            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>keyboard_voice</span>
-            Try as Resident
-          </Button>
-          <Button variant="secondary" size="lg" onClick={() => enter('board')}>
-            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>dashboard</span>
-            View Board Dashboard
-          </Button>
+          {IS_DEMO ? (
+            <>
+              <Button size="lg" onClick={() => tryDemo('resident')}>
+                <span className="material-symbols-rounded" style={{ fontSize: 18 }}>keyboard_voice</span>
+                Try as Resident
+              </Button>
+              <Button variant="secondary" size="lg" onClick={() => tryDemo('board')}>
+                <span className="material-symbols-rounded" style={{ fontSize: 18 }}>dashboard</span>
+                View Board Dashboard
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button size="lg" onClick={goToLogin}>
+                <span className="material-symbols-rounded" style={{ fontSize: 18 }}>arrow_forward</span>
+                Get started free
+              </Button>
+              <Button variant="secondary" size="lg" onClick={() => { tryDemo('resident') }}>
+                <span className="material-symbols-rounded" style={{ fontSize: 18 }}>keyboard_voice</span>
+                Live demo
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Dashboard preview */}
@@ -213,9 +241,9 @@ export default function Landing() {
           <p className="text-text-secondary mb-12">No lengthy onboarding. No training sessions. Your HOA is live today.</p>
           <div className="grid sm:grid-cols-3 gap-6">
             {[
-              { step: '01', title: 'Residents sign in', desc: 'Phone verification gets residents in instantly. No passwords to manage.' },
-              { step: '02', title: 'Speak or type', desc: 'AI classifies every complaint in under a second and routes it correctly.' },
-              { step: '03', title: 'Board acts', desc: 'Board sees every update live. Status changes, reminders, exports — all instant.' },
+              { step: '01', title: 'Create your account', desc: 'Sign up with email, join your HOA, and you\'re in. Takes under 2 minutes.' },
+              { step: '02', title: 'Speak or type', desc: 'AI classifies every complaint in under a second and routes it to the right team.' },
+              { step: '03', title: 'Board acts instantly', desc: 'Board sees every update live. Status changes, reminders, exports — all in one place.' },
             ].map(s => (
               <div key={s.step} className="relative">
                 <div className="text-4xl font-bold text-border mb-3">{s.step}</div>
@@ -254,16 +282,33 @@ export default function Landing() {
       <section className="py-20">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-3xl font-bold text-text-primary mb-3">Ready to modernize your HOA?</h2>
-          <p className="text-text-secondary mb-8">Try the full demo — no account needed. Experience both the resident and board sides.</p>
+          <p className="text-text-secondary mb-8">
+            {IS_DEMO ? 'Try the full demo — no account needed. Experience both the resident and board sides.' : 'Get started in 2 minutes. Or try the live demo first — no account needed.'}
+          </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button size="lg" onClick={() => enter('resident')}>
-              <span className="material-symbols-rounded" style={{ fontSize: 18 }}>keyboard_voice</span>
-              Try as Resident
-            </Button>
-            <Button variant="secondary" size="lg" onClick={() => enter('board')}>
-              <span className="material-symbols-rounded" style={{ fontSize: 18 }}>dashboard</span>
-              View Board View
-            </Button>
+            {IS_DEMO ? (
+              <>
+                <Button size="lg" onClick={() => tryDemo('resident')}>
+                  <span className="material-symbols-rounded" style={{ fontSize: 18 }}>keyboard_voice</span>
+                  Try as Resident
+                </Button>
+                <Button variant="secondary" size="lg" onClick={() => tryDemo('board')}>
+                  <span className="material-symbols-rounded" style={{ fontSize: 18 }}>dashboard</span>
+                  View Board Demo
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button size="lg" onClick={goToLogin}>
+                  <span className="material-symbols-rounded" style={{ fontSize: 18 }}>arrow_forward</span>
+                  Get started free
+                </Button>
+                <Button variant="secondary" size="lg" onClick={() => tryDemo('resident')}>
+                  <span className="material-symbols-rounded" style={{ fontSize: 18 }}>keyboard_voice</span>
+                  Live demo
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </section>

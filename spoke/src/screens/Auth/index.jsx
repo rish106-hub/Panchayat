@@ -4,6 +4,8 @@ import { useAuth }  from '../../context/AuthContext'
 import { Button }   from '../../components/ui/Button'
 import { Input }    from '../../components/ui/Input'
 
+// ── Logo ──────────────────────────────────────────────────────────────────
+
 function Logo() {
   const navigate = useNavigate()
   return (
@@ -16,126 +18,271 @@ function Logo() {
   )
 }
 
-function PhoneStep({ onSent }) {
-  const { sendOtp } = useAuth()
-  const [phone,   setPhone]   = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error,   setError]   = useState('')
+// ── Sign In ───────────────────────────────────────────────────────────────
 
-  function normalise(raw) {
-    const d = raw.replace(/[^\d+]/g, '')
-    return d.startsWith('+') ? d : `+1${d}`
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault()
-    const p = normalise(phone)
-    if (p.length < 10) { setError('Enter a valid phone number.'); return }
-    setError('')
-    setLoading(true)
-    const { error: err } = await sendOtp(p)
-    setLoading(false)
-    if (err) { setError(typeof err === 'string' ? err : err.message); return }
-    onSent(p)
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <h1 className="text-xl font-bold text-text-primary mb-1">Sign in to Spoke</h1>
-        <p className="text-sm text-text-secondary">Enter your phone number to receive a verification code.</p>
-      </div>
-      <Input
-        label="Phone number"
-        type="tel"
-        value={phone}
-        onChange={e => setPhone(e.target.value)}
-        placeholder="+1 (555) 000-0000"
-        autoFocus
-        error={error}
-      />
-      <Button type="submit" fullWidth loading={loading}>
-        Send verification code
-        {!loading && <span className="material-symbols-rounded" style={{ fontSize: 16 }}>arrow_forward</span>}
-      </Button>
-    </form>
-  )
-}
-
-function OtpStep({ phone, onBack }) {
+function SignInForm({ onSwitch }) {
   const navigate = useNavigate()
-  const { verifyOtp } = useAuth()
-  const [otp,     setOtp]     = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error,   setError]   = useState('')
+  const { signInWithEmail } = useAuth()
+  const [email,    setEmail]    = useState('')
+  const [password, setPassword] = useState('')
+  const [showPwd,  setShowPwd]  = useState(false)
+  const [loading,  setLoading]  = useState(false)
+  const [error,    setError]    = useState('')
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (otp.length < 6) { setError('Enter the 6-digit code.'); return }
+    if (!email.trim() || !password) return
     setError('')
     setLoading(true)
-    const { error: err } = await verifyOtp(phone, otp.trim())
+    const { error: err } = await signInWithEmail(email.trim().toLowerCase(), password)
     setLoading(false)
-    if (err) { setError(typeof err === 'string' ? err : err.message); return }
+    if (err) { setError(err.message ?? 'Sign in failed. Check your credentials.'); return }
     navigate('/dashboard', { replace: true })
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm text-text-muted hover:text-text-primary mb-1 transition-colors">
-        <span className="material-symbols-rounded" style={{ fontSize: 16 }}>arrow_back</span>
-        Back
-      </button>
       <div>
-        <h1 className="text-xl font-bold text-text-primary mb-1">Check your phone</h1>
-        <p className="text-sm text-text-secondary">
-          6-digit code sent to <span className="font-medium text-text-primary">{phone}</span>
-        </p>
+        <h1 className="text-2xl font-bold text-text-primary mb-1">Welcome back</h1>
+        <p className="text-sm text-text-secondary">Sign in to your Spoke account.</p>
       </div>
+
+      <Input
+        label="Email address"
+        type="email"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        placeholder="you@example.com"
+        autoComplete="email"
+        autoFocus
+        required
+      />
+
       <div className="space-y-1.5">
-        <label className="text-sm font-medium text-text-primary">Verification code</label>
-        <input
-          type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          maxLength={6}
-          value={otp}
-          onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
-          placeholder="000000"
-          autoFocus
-          className="w-full h-12 rounded-lg border border-border bg-surface text-center text-xl font-mono font-medium text-text-primary tracking-[0.4em] placeholder:text-text-muted placeholder:tracking-normal focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-600 transition-colors"
-        />
-        {error && <p className="text-xs text-danger">{error}</p>}
+        <label className="text-sm font-medium text-text-primary">Password</label>
+        <div className="relative">
+          <input
+            type={showPwd ? 'text' : 'password'}
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder="••••••••"
+            autoComplete="current-password"
+            required
+            className="w-full h-9 px-3 pr-10 rounded-lg border border-border bg-surface text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-600 transition-colors"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPwd(s => !s)}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
+            tabIndex={-1}
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>
+              {showPwd ? 'visibility_off' : 'visibility'}
+            </span>
+          </button>
+        </div>
       </div>
-      <Button type="submit" fullWidth loading={loading}>
-        Verify and sign in
+
+      {error && (
+        <div className="flex items-start gap-2 p-3 bg-danger/5 border border-danger/20 rounded-lg">
+          <span className="material-symbols-rounded text-danger shrink-0 mt-0.5" style={{ fontSize: 16 }}>error</span>
+          <p className="text-xs text-danger leading-relaxed">{error}</p>
+        </div>
+      )}
+
+      <Button type="submit" fullWidth loading={loading} disabled={!email || !password}>
+        Sign in
+        {!loading && <span className="material-symbols-rounded" style={{ fontSize: 16 }}>arrow_forward</span>}
       </Button>
+
+      <p className="text-center text-sm text-text-muted">
+        No account?{' '}
+        <button type="button" onClick={onSwitch} className="text-brand-600 font-medium hover:underline">
+          Create one free
+        </button>
+      </p>
     </form>
   )
 }
 
+// ── Sign Up ───────────────────────────────────────────────────────────────
+
+function SignUpForm({ onSwitch }) {
+  const navigate = useNavigate()
+  const { signUpWithEmail } = useAuth()
+  const [name,     setName]     = useState('')
+  const [email,    setEmail]    = useState('')
+  const [password, setPassword] = useState('')
+  const [confirm,  setConfirm]  = useState('')
+  const [showPwd,  setShowPwd]  = useState(false)
+  const [loading,  setLoading]  = useState(false)
+  const [error,    setError]    = useState('')
+  const [success,  setSuccess]  = useState(false)
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    if (password.length < 8) { setError('Password must be at least 8 characters.'); return }
+    if (password !== confirm) { setError('Passwords do not match.'); return }
+    setError('')
+    setLoading(true)
+    const { data, error: err } = await signUpWithEmail(email.trim().toLowerCase(), password, name.trim())
+    setLoading(false)
+    if (err) { setError(err.message ?? 'Sign up failed. Try again.'); return }
+    // If email confirmation is disabled → session exists, redirect to onboarding
+    if (data?.session) {
+      navigate('/onboarding', { replace: true })
+    } else {
+      // Email confirmation required
+      setSuccess(true)
+    }
+  }
+
+  if (success) {
+    return (
+      <div className="text-center space-y-4">
+        <div className="w-14 h-14 rounded-full bg-success/10 flex items-center justify-center mx-auto">
+          <span className="material-symbols-rounded text-success" style={{ fontSize: 28, fontVariationSettings: "'FILL' 1" }}>mark_email_read</span>
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-text-primary mb-1">Check your email</h2>
+          <p className="text-sm text-text-secondary">
+            We sent a confirmation link to <span className="font-medium text-text-primary">{email}</span>.
+            Click it to activate your account, then sign in.
+          </p>
+        </div>
+        <Button fullWidth variant="secondary" onClick={onSwitch}>Back to sign in</Button>
+      </div>
+    )
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <h1 className="text-2xl font-bold text-text-primary mb-1">Create your account</h1>
+        <p className="text-sm text-text-secondary">Join your HOA on Spoke. Free to get started.</p>
+      </div>
+
+      <Input
+        label="Full name"
+        value={name}
+        onChange={e => setName(e.target.value)}
+        placeholder="Alex Rivera"
+        autoComplete="name"
+        autoFocus
+        required
+      />
+
+      <Input
+        label="Email address"
+        type="email"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        placeholder="you@example.com"
+        autoComplete="email"
+        required
+      />
+
+      <div className="space-y-1.5">
+        <label className="text-sm font-medium text-text-primary">Password</label>
+        <div className="relative">
+          <input
+            type={showPwd ? 'text' : 'password'}
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder="At least 8 characters"
+            autoComplete="new-password"
+            required
+            minLength={8}
+            className="w-full h-9 px-3 pr-10 rounded-lg border border-border bg-surface text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-600 transition-colors"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPwd(s => !s)}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
+            tabIndex={-1}
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>
+              {showPwd ? 'visibility_off' : 'visibility'}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <Input
+        label="Confirm password"
+        type="password"
+        value={confirm}
+        onChange={e => setConfirm(e.target.value)}
+        placeholder="••••••••"
+        autoComplete="new-password"
+        required
+      />
+
+      {error && (
+        <div className="flex items-start gap-2 p-3 bg-danger/5 border border-danger/20 rounded-lg">
+          <span className="material-symbols-rounded text-danger shrink-0 mt-0.5" style={{ fontSize: 16 }}>error</span>
+          <p className="text-xs text-danger leading-relaxed">{error}</p>
+        </div>
+      )}
+
+      <Button type="submit" fullWidth loading={loading} disabled={!name || !email || !password || !confirm}>
+        Create account
+        {!loading && <span className="material-symbols-rounded" style={{ fontSize: 16 }}>arrow_forward</span>}
+      </Button>
+
+      <p className="text-center text-sm text-text-muted">
+        Already have an account?{' '}
+        <button type="button" onClick={onSwitch} className="text-brand-600 font-medium hover:underline">
+          Sign in
+        </button>
+      </p>
+    </form>
+  )
+}
+
+// ── Main screen ───────────────────────────────────────────────────────────
+
 export default function AuthScreen() {
   const { isAuthenticated, IS_DEMO } = useAuth()
-  const [step,  setStep]  = useState('phone')
-  const [phone, setPhone] = useState('')
+  const [tab, setTab] = useState('signin')
 
   if (IS_DEMO || isAuthenticated) return <Navigate to="/dashboard" replace />
 
   return (
     <div className="min-h-screen bg-canvas flex">
-      {/* Left panel (desktop) */}
-      <div className="hidden lg:flex flex-col bg-brand-600 w-96 shrink-0 p-10 text-white">
-        <div className="flex items-center gap-2.5 mb-auto">
-          <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
-            <span className="material-symbols-rounded text-white" style={{ fontSize: 18 }}>spatial_audio</span>
+      {/* Left panel — desktop only */}
+      <div className="hidden lg:flex flex-col bg-brand-600 w-[420px] shrink-0 p-10">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center gap-2 text-brand-200 hover:text-white transition-colors mb-auto"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
+              <span className="material-symbols-rounded text-white" style={{ fontSize: 18 }}>spatial_audio</span>
+            </div>
+            <span className="font-semibold text-white">Spoke</span>
           </div>
-          <span className="font-semibold">Spoke</span>
+        </button>
+
+        <div className="mb-auto pt-16">
+          <blockquote className="text-2xl font-bold text-white leading-snug mb-4">
+            "Spoke cut our complaint resolution time by 60%. Residents love the voice feature."
+          </blockquote>
+          <p className="text-brand-200 text-sm">— Sarah M., Board President, Sunridge Estates</p>
         </div>
-        <div>
-          <p className="text-2xl font-bold leading-snug mb-3">
-            "Spoke saved us hours every week. Residents love the voice feature."
-          </p>
-          <p className="text-brand-200 text-sm">— Board President, Maple Heights HOA</p>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { val: '2 min', label: 'Avg complaint time' },
+            { val: '94%',   label: 'Resident satisfaction' },
+            { val: '60%',   label: 'Faster resolution' },
+          ].map(s => (
+            <div key={s.label} className="bg-white/10 rounded-xl p-3 text-center">
+              <p className="text-xl font-bold text-white">{s.val}</p>
+              <p className="text-brand-200 text-xs mt-0.5">{s.label}</p>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -143,13 +290,15 @@ export default function AuthScreen() {
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
           <Logo />
-          {step === 'phone' ? (
-            <PhoneStep onSent={p => { setPhone(p); setStep('otp') }} />
+
+          {tab === 'signin' ? (
+            <SignInForm onSwitch={() => setTab('signup')} />
           ) : (
-            <OtpStep phone={phone} onBack={() => setStep('phone')} />
+            <SignUpForm onSwitch={() => setTab('signin')} />
           )}
+
           <p className="mt-6 text-center text-xs text-text-muted">
-            By signing in, you agree to our{' '}
+            By continuing, you agree to our{' '}
             <a href="#" className="text-brand-600 hover:underline">Terms</a>{' '}and{' '}
             <a href="#" className="text-brand-600 hover:underline">Privacy Policy</a>.
           </p>

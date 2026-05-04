@@ -16,7 +16,7 @@ const BOARD_NAV = [
   { to: '/dashboard',              icon: 'dashboard',     label: 'Overview',    end: true },
   { to: '/dashboard/complaints',   icon: 'inbox',         label: 'Complaints'   },
   { to: '/dashboard/residents',    icon: 'group',         label: 'Residents'    },
-  { to: '/dashboard/maintenance',  icon: 'account_balance_wallet', label: 'Maintenance' },
+  { to: '/dashboard/maintenance',  icon: 'build',         label: 'Maintenance' },
   { to: '/dashboard/gate',         icon: 'door_front',    label: 'Gate Log'     },
 ]
 

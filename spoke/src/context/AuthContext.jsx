@@ -74,25 +74,29 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  // ── Phone OTP ────────────────────────────────────────────────────────────
+  // ── Email + Password ─────────────────────────────────────────────────────
 
-  const sendOtp = useCallback(async (phone) => {
+  const signInWithEmail = useCallback(async (email, password) => {
     if (IS_DEMO) return { error: null }
-    const { error } = await supabase.auth.signInWithOtp({ phone })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) setError(error.message)
-    return { error }
+    return { data, error }
   }, [])
 
-  const verifyOtp = useCallback(async (phone, token) => {
+  const signUpWithEmail = useCallback(async (email, password, name) => {
     if (IS_DEMO) return { error: null }
-    const { data, error } = await supabase.auth.verifyOtp({
-      phone,
-      token,
-      type: 'sms',
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { name } },
     })
     if (error) setError(error.message)
     return { data, error }
   }, [])
+
+  // Keep OTP methods as no-ops for backwards compat
+  const sendOtp   = useCallback(async () => ({ error: null }), [])
+  const verifyOtp = useCallback(async () => ({ error: null }), [])
 
   // ── Sign out ─────────────────────────────────────────────────────────────
 
@@ -133,6 +137,8 @@ export function AuthProvider({ children }) {
       isAuthenticated,
       isBoard,
       IS_DEMO,
+      signInWithEmail,
+      signUpWithEmail,
       sendOtp,
       verifyOtp,
       signOut,

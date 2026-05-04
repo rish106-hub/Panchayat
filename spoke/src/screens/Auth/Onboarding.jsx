@@ -31,7 +31,7 @@ export default function Onboarding() {
     if (!unit.trim()) { setError('Enter your unit number.'); return }
     setError('')
     setLoading(true)
-    const { error: err } = await joinSociety(user.id, socId, unit.trim(), role)
+    const { error: err } = await joinSociety(user.id, socId, unit.trim(), role, name.trim())
     setLoading(false)
     if (err) { setError(err.message); return }
     await refreshProfile()

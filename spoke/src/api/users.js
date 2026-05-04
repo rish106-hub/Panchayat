@@ -44,17 +44,20 @@ export async function fetchResidents(societyId) {
 
 // ── Join society (first-time setup) ───────────────────────────────────────
 
-export async function joinSociety(userId, societyId, unitNumber, role = 'resident') {
+export async function joinSociety(userId, societyId, unitNumber, role = 'resident', name) {
   if (IS_DEMO) return { data: null, error: null }
+
+  const updates = {
+    society_id:  societyId,
+    unit_number: unitNumber,
+    role,
+    onboarded:   true,
+  }
+  if (name) updates.name = name
 
   const { data, error } = await supabase
     .from('users')
-    .update({
-      society_id:  societyId,
-      unit_number: unitNumber,
-      role,
-      onboarded:   true,
-    })
+    .update(updates)
     .eq('id', userId)
     .select()
     .single()

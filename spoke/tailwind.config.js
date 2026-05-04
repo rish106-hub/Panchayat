@@ -19,6 +19,7 @@ export default {
           500: '#6366F1',
           600: '#4F46E5',
           700: '#4338CA',
+          800: '#3730A3',
         },
         success: { DEFAULT: '#059669', light: '#D1FAE5', text: '#065F46' },
         warning: { DEFAULT: '#D97706', light: '#FEF3C7', text: '#92400E' },
@@ -28,6 +29,9 @@ export default {
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
+      },
+      fontSize: {
+        '2xs': ['0.625rem', { lineHeight: '0.875rem' }],
       },
       boxShadow: {
         card:    '0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06)',
