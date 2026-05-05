@@ -1,44 +1,32 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Input }  from '@/components/ui/Input'
 import { useToast } from '@/components/ui/Toast'
 
 export default function OnboardingPage() {
-  const supabase = createClient()
-  const router   = useRouter()
-  const toast    = useToast()
-  const [code, setCode]     = useState('')
-  const [unit, setUnit]     = useState('')
-  const [phone, setPhone]   = useState('')
-  const [loading, setLoad]  = useState(false)
-  const [error, setError]   = useState('')
+  const router = useRouter()
+  const toast  = useToast()
+  const [code, setCode]    = useState('')
+  const [loading, setLoad] = useState(false)
+  const [error, setError]  = useState('')
 
   async function handleJoin(e) {
     e.preventDefault()
     setError(''); setLoad(true)
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/login'); return }
-
-    const { data: society } = await supabase.from('societies').select('id').eq('invite_code', code.trim().toUpperCase()).single()
-    if (!society) { setError('Invalid invite code. Check with your society admin.'); setLoad(false); return }
-
-    const { error } = await supabase.from('users').upsert({
-      id:          user.id,
-      society_id:  society.id,
-      unit_number: unit.trim().toUpperCase(),
-      phone:       phone.trim() || null,
-      role:        'resident',
-      onboarded:   true,
+    const res = await fetch('/api/onboarding', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ invite_code: code }),
     })
-
+    const data = await res.json()
     setLoad(false)
-    if (error) { setError(error.message); return }
 
-    toast('Welcome to your community!')
+    if (!res.ok) { setError(data.error); return }
+
+    toast(`Welcome, ${data.name}! You're all set.`)
     router.push('/dashboard')
   }
 
@@ -53,8 +41,13 @@ export default function OnboardingPage() {
         </div>
 
         <div className="bg-surface border border-border rounded-2xl shadow-card p-6">
-          <h1 className="text-lg font-bold text-text-primary mb-1">Join your community</h1>
-          <p className="text-sm text-text-muted mb-6">Enter your society invite code to get started.</p>
+          <div className="w-12 h-12 rounded-2xl bg-brand-50 flex items-center justify-center mb-4 mx-auto">
+            <span className="material-symbols-rounded text-brand-600" style={{ fontSize: 24 }}>mail</span>
+          </div>
+          <h1 className="text-lg font-bold text-text-primary mb-1 text-center">Enter your invite code</h1>
+          <p className="text-sm text-text-muted mb-6 text-center">
+            Your society admin sent you a personal invite code. Enter it below to link your account.
+          </p>
 
           {error && (
             <div className="mb-4 flex items-start gap-2 p-3 rounded-xl bg-danger/10 text-danger text-sm">
@@ -64,15 +57,23 @@ export default function OnboardingPage() {
           )}
 
           <form onSubmit={handleJoin} className="space-y-4">
-            <Input label="Invite code" value={code} onChange={e => setCode(e.target.value)}
-              placeholder="e.g. PARKVIEW2024" required className="font-mono tracking-widest uppercase" />
-            <Input label="Unit number" value={unit} onChange={e => setUnit(e.target.value)} placeholder="e.g. 4B" required />
-            <Input label="Phone (optional)" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 98765 43210" type="tel" />
+            <Input
+              label="Invite code"
+              value={code}
+              onChange={e => setCode(e.target.value.toUpperCase())}
+              placeholder="e.g. ABCD-1234"
+              required
+              className="font-mono tracking-widest text-center text-lg"
+            />
             <Button type="submit" fullWidth loading={loading}>
               <span className="material-symbols-rounded" style={{ fontSize: 16 }}>arrow_forward</span>
               Join community
             </Button>
           </form>
+
+          <p className="text-xs text-text-muted text-center mt-4">
+            No code? Contact your society secretary to get one.
+          </p>
         </div>
       </div>
     </div>
